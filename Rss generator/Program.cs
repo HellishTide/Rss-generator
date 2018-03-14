@@ -267,8 +267,8 @@ namespace Rss_generator
                 "<title> Северная правда - Главная </title >" + "\n" +
                 "<link> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/</link>" + "\n" +
                 "<description> Газета Северная правда</description >" + "\n" +
-                "<yandex:logo> http://xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/SP_100px.png </yandex:logo>" + "\n" +
-                "<yandex:logo type=\"square\"> http://xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/SP180x180%20_1.png </yandex:logo>" + "\n" +
+                "<yandex:logo> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/100.png </yandex:logo>" + "\n" +
+                "<yandex:logo type=\"square\"> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/180px.png </yandex:logo>" + "\n" +
                 "<language> ru - ru </language>" + "\n" +
                 st_info + "\n" +
                 "</channel>" + "\n" +
