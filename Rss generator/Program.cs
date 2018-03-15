@@ -32,6 +32,7 @@ namespace Rss_generator
     {
         public static void Main()
         {
+            Console.Title = "RSS Generator";
             try
             {
                 GetRSS();
@@ -41,13 +42,24 @@ namespace Rss_generator
             }
             catch
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Something goes wrong!");
             }
             finally
             {
-                Console.WriteLine("Complete");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("Complete!");
                 Console.ReadKey();
             }
+        }
+
+        private static string TimeAdd(string dateString)
+        {
+            DateTime dateTime = DateTime.Parse(dateString);
+            dateTime = dateTime.AddHours(3.0);
+            string text = dateTime.ToString("r");
+            text = text.Replace("GMT", "+0300");
+            return "<pubDate>" + text + "</pubDate>";
         }
 
         public static string st_info = "";
@@ -70,26 +82,13 @@ namespace Rss_generator
                     path = directory + @"\Rss";
                     Directory.CreateDirectory(path);
                 }
-                using (FileStream fs = File.Create(path + @"\news.rss"))
+                using (FileStream fileStream = File.Create(path + @"\news.rss"))
                 {
-                    string schema = GenerateXMLSchema();
-                    Byte[] info = new UTF8Encoding(true).GetBytes(schema);
-                    // Add some information to the file.
-                    fs.Write(info, 0, info.Length);
+                    string s = GenerateXMLSchema();
+                    byte[] bytes = new UTF8Encoding(true).GetBytes(s);
+                    fileStream.Write(bytes, 0, bytes.Length);
                 }
-                /*
-                // Open the stream and read it back.
-                StreamReader sr = File.OpenText(path);
-                {
-                    string s = "";
-                    while ((s = sr.ReadLine()) != null)
-                    {
-                        Console.WriteLine(s);
-                    }
-                }
-                */
             }
-
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
@@ -99,163 +98,153 @@ namespace Rss_generator
         private static void GetText()
         {
             string title = "";
-            string description = "";
-            string fullText = "";
+            string text = "";
+            string text2 = "";
             string path = Environment.GetCommandLineArgs()[0];
             try
             {
-                var directory = Path.GetDirectoryName(path);
-                string[] newsFile = File.ReadAllLines(directory + @"\MyNews.txt");
-
-                foreach (string dr in newsFile)
+                string directoryName = Path.GetDirectoryName(path);
+                string[] array = File.ReadAllLines(directoryName + "\\MyNews.txt");
+                string[] array2 = array;
+                foreach (string text3 in array2)
                 {
-                    if (dr != "" && title == "")
+                    if (text3 != "" && title == "")
                     {
-                        title = dr;
+                        title = text3;
                     }
-                    else if (dr != "" && title != "" && description == "")
+                    else if (text3 != "" && title != "" && text == "")
                     {
-                        description = dr;
+                        text = text + text3 + "\n";
                         try
                         {
-                            fullItems.Find(x => x.title.Contains(title)).description = description;
+                            fullItems.Find((Item x) => x.title.Contains(title)).description = text;
                         }
-                        catch { };
+                        catch
+                        {
+                        }
                     }
-                    else if (dr != "" && dr != " " && title != "" && description != "" && dr != "-------------------------------")
+                    else if (text3 != "" && text3 != " " && title != "" && text != "" && text3 != "-------------------------------")
                     {
-                        fullText += dr + "\n";
+                        text2 = text2 + text3 + "\n";
                         try
-                        { fullItems.Find(x => x.title.Contains(title)).fullText = fullText; }
-                        catch { };
-                    }
-                    if (dr == "-------------------------------" && title != "" && description != "" && fullText != "")
-                    {
-                        title = description = fullText = "";
-                    }
-                }
-            } catch { Console.WriteLine("File MyNews.txt not fouded"); }
-        }
-
-        private static void GetRSS()
-        {
-            string path = Environment.GetCommandLineArgs()[0];
-            var directory = Path.GetDirectoryName(path);
-            try
-            {
-                string[] rssFile = File.ReadAllLines(directory + @"\myRSS.txt");
-                string title = "";
-                string description = "";
-                string link = "";
-                string imgSRC = "";
-                string author = "";
-                string pubDate = "";
-                bool f = false;
-
-                foreach (string dr in rssFile)
-                {
-                    //Проверка на вхождение в item
-                    if (dr.Contains("<item>") || f == true)
-                    {
-                        f = true;//Флаг нахождения в item
-                                 //Получение заголовка
-                        if (dr.Contains("<title>"))
                         {
-                            String searchString = "<title>";
-                            int startIndex = dr.IndexOf(searchString);
-                            searchString = "</" + searchString.Substring(1);
-                            int endIndex = dr.IndexOf(searchString);
-                            title = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
+                            fullItems.Find((Item x) => x.title.Contains(title)).fullText = text2;
                         }
-                        /*
-                        //Получение подзаголовка
-                        if (dr.Contains("<description>"))
+                        catch
                         {
-                            String searchString = "<strong>";
-                            int startIndex = dr.IndexOf(searchString)+8;
-                            searchString = "</" + searchString.Substring(1);
-                            int endIndex = dr.IndexOf(searchString)-8;
-                            description = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
-                            Console.WriteLine(description);
-                        }
-                        */
-                        //Получение ссылки на новость
-                        if (dr.Contains("<link>"))
-                        {
-                            String searchString = "<link>";
-                            int startIndex = dr.IndexOf(searchString);
-                            searchString = "</" + searchString.Substring(1);
-                            int endIndex = dr.IndexOf(searchString);
-                            link = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
-                            //Console.WriteLine(link);
-                        }
-                        //Получение автора новости
-                        /*
-                        if (dr.Contains("<author>"))
-                        {
-                            String searchString = "<author>";
-                            int startIndex = dr.IndexOf(searchString);
-                            searchString = "</" + searchString.Substring(1);
-                            int endIndex = dr.IndexOf(searchString);
-                            author = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
-                            //Console.WriteLine(author);
-                        }
-                        */
-                        //Получение даты написания новости
-                        if (dr.Contains("<pubDate>"))
-                        {
-                            String searchString = "<pubDate>";
-                            int startIndex = dr.IndexOf(searchString);
-                            searchString = "</" + searchString.Substring(1);
-                            int endIndex = dr.IndexOf(searchString);
-                            pubDate = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
-                            //Console.WriteLine(pubDate);
-                        }
-                        //Получение ссылки на картинку
-                        if (dr.Contains("<img src="))
-                        {
-                            String searchString = "src=";
-                            int startIndex = dr.IndexOf(searchString) + 4;
-                            searchString = "width";
-                            int endIndex = dr.IndexOf(searchString) - 6;
-                            imgSRC = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
-                            //Console.WriteLine(imgSRC);
                         }
                     }
-                    if (dr.Contains("</item>"))
+                    if (text3 == "-------------------------------" && title != "" && text != "" && text2 != "")
                     {
-                        Item here = new Item();
-                        here.SetItem(title, description, pubDate, author, link, imgSRC, "");
-                        fullItems.Add(here);
-                        f = false;
+                        text = (title = (text2 = ""));
                     }
                 }
             }
             catch
             {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("File MyNews.txt not fouded");
+            }
+        }
+
+
+        private static void GetRSS()
+        {
+            string path = Environment.GetCommandLineArgs()[0];
+            string directoryName = Path.GetDirectoryName(path);
+            try
+            {
+                string[] array = File.ReadAllLines(directoryName + "\\myRSS.txt");
+                string titl = "";
+                string desc = "";
+                string lk = "";
+                string url = "";
+                string aut = "";
+                string date = "";
+                bool flag = false;
+                string[] array2 = array;
+                foreach (string text in array2)
+                {
+                    if (text.Contains("<item>") | flag)
+                    {
+                        flag = true;
+                        if (text.Contains("<title>"))
+                        {
+                            string text2 = "<title>";
+                            int num = text.IndexOf(text2);
+                            text2 = "</" + text2.Substring(1);
+                            int num2 = text.IndexOf(text2);
+                            titl = text.Substring(num, num2 + text2.Length - num);
+                        }
+                        if (text.Contains("<link>"))
+                        {
+                            string text3 = "<link>";
+                            int num3 = text.IndexOf(text3);
+                            text3 = "</" + text3.Substring(1);
+                            int num4 = text.IndexOf(text3);
+                            lk = text.Substring(num3, num4 + text3.Length - num3);
+                        }
+                        if (text.Contains("<author>"))
+                        {
+                            string text4 = "<author>";
+                            int num5 = text.IndexOf(text4);
+                            text4 = "</" + text4.Substring(1);
+                            int num6 = text.IndexOf(text4);
+                            aut = text.Substring(num5, num6 + text4.Length - num5);
+                        }
+                        if (text.Contains("<pubDate>"))
+                        {
+                            string text5 = "<pubDate>";
+                            int num7 = text.IndexOf(text5) + 9;
+                            text5 = "</" + text5.Substring(1);
+                            int num8 = text.IndexOf(text5) - 10;
+                            date = text.Substring(num7, num8 + text5.Length - num7);
+                            date = TimeAdd(date);
+                        }
+                        if (text.Contains("<img src="))
+                        {
+                            string value = "src=";
+                            int num9 = text.IndexOf(value) + 4;
+                            value = "width";
+                            int num10 = text.IndexOf(value) - 6;
+                            url = text.Substring(num9, num10 + value.Length - num9);
+                        }
+                    }
+                    if (text.Contains("</item>"))
+                    {
+                        Item item = new Item();
+                        item.SetItem(titl, desc, date, aut, lk, url, "");
+                        fullItems.Add(item);
+                        flag = false;
+                    }
+                }
+            }
+            catch
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("File myRSS.txt not fouded");
             }
         }
 
         private static string GetInfo()
         {
-            foreach (Item he in fullItems)
+            foreach (Item fullItem in fullItems)
             {
-                string item =
-                    "<item>" + "\n" +
-                    he.title + "\n" +
-                    he.link + "\n" +
-                    "<description>" + "\n" +
-                    he.description + "\n" +
-                    "</description>" + "\n" +
-                    he.pubDate + "\n" +
-                    he.author + "\n" +
-                    "<enclosure url=" + he.enclouser + "/>" + "\n" +
-                    "<yandex:full-text>" + "\n" +
-                    he.fullText +
-                    "</yandex:full-text>" + "\n" +
-                    "</item>" + "\n";
-                st_info += item;
+                string str = 
+                    "<item>\n" + 
+                    fullItem.title + "\n" +
+                    fullItem.link + 
+                    "\n<description>\n" + 
+                    fullItem.description + 
+                    "</description>\n" + 
+                    fullItem.pubDate + 
+                    "\n<enclosure url=" + 
+                    fullItem.enclouser + 
+                    "/>\n<yandex:full-text>\n" + 
+                    fullItem.description + "\n" + 
+                    fullItem.fullText + 
+                    "</yandex:full-text>\n</item>\n";
+                st_info += str;
             }
             return st_info;
         }
