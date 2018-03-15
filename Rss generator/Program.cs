@@ -190,6 +190,7 @@ namespace Rss_generator
                             //Console.WriteLine(link);
                         }
                         //Получение автора новости
+                        /*
                         if (dr.Contains("<author>"))
                         {
                             String searchString = "<author>";
@@ -199,6 +200,7 @@ namespace Rss_generator
                             author = dr.Substring(startIndex, endIndex + searchString.Length - startIndex);
                             //Console.WriteLine(author);
                         }
+                        */
                         //Получение даты написания новости
                         if (dr.Contains("<pubDate>"))
                         {
@@ -265,11 +267,11 @@ namespace Rss_generator
                 "<rss xmlns:yandex=\"http://news.yandex.ru\" xmlns:media=\"http://search.yahoo.com/mrss/\" version=\"2.0\">" + "\n" +
                 "<channel>" + "\n" +
                 "<title> Северная правда - Главная </title >" + "\n" +
-                "<link> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/</link>" + "\n" +
-                "<description> Газета Северная правда</description >" + "\n" +
-                "<yandex:logo> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/100.png </yandex:logo>" + "\n" +
-                "<yandex:logo type=\"square\"> http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/180px.png </yandex:logo>" + "\n" +
-                "<language> ru - ru </language>" + "\n" +
+                "<link>http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/</link>" + "\n" +
+                "<description>Газета Северная правда</description>" + "\n" +
+                "<yandex:logo>http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/100.png</yandex:logo>" + "\n" +
+                "<yandex:logo type=\"square\">http://www.xn--80aaafcmcb6evaidf6r.xn--p1ai/images/vipuski/180px.png</yandex:logo>" + "\n" +
+                "<language>ru-ru</language>" + "\n" +
                 st_info + "\n" +
                 "</channel>" + "\n" +
                 "</rss>";
